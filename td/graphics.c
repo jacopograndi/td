@@ -5,14 +5,6 @@
 
 #include "dataframe.h" 
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, 1);
-}
-
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -20,7 +12,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
-	WindowOpt *opt = (WindowOpt*) glfwGetWindowUserPointer(window);
+	WindowOpt *opt = ((WindowPtr*) glfwGetWindowUserPointer(window))->opt;
 	opt->scr_width = width;
 	opt->scr_height = height;
 }
@@ -31,7 +23,7 @@ int init_graphics(GLFWwindow** window) {
 	// glfw: initialize and configure
     // ------------------------------
     glfwInit();
-	//glfwWindowHint(GLFW_SAMPLES, 16);
+	glfwWindowHint(GLFW_SAMPLES, 16);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -45,7 +37,7 @@ int init_graphics(GLFWwindow** window) {
     // glfw window creation
     // --------------------
     *window = glfwCreateWindow(900, 600, 
-		"Pawndemonium [all squares are pawns, capture every piece or get to the last rank! score is on the right]"
+		"td"
 		, NULL, NULL
 	);
     if (*window == NULL)
@@ -65,9 +57,9 @@ int init_graphics(GLFWwindow** window) {
         return -1;
     }
 
-	//glEnable(GL_MULTISAMPLE); 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glEnable(GL_MULTISAMPLE); 
 	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	glCullFace(GL_BACK);
 	glEnable(GL_DEPTH_TEST);
+	return 0;
 }

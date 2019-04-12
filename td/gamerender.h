@@ -1,6 +1,10 @@
 #ifndef gamerenderh
 #define gamerenderh
 
-void game_render (GLFWwindow *window, int shader, GameState *gst);
+#include "linmath.h"
+#include "model.h"
+
+void mat_from_transform (mat4x4 mat, vec3 pos, vec3 scale, quat rot);
+void game_render (GLFWwindow *window, int shader, int shaderterrain, GameState *gst, Mesh *t);
 
 #endif

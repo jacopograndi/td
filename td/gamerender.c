@@ -3,127 +3,89 @@
 
 #include "linmath.h"
 #include "dataframe.h"
+#include "model.h"
 
-void render_quad (int shaderProgram, mat4x4 mat_ortho, 
-	vec3 vec_trans, vec3 vec_scale, quat rot, vec4 color) 
-{
+void mat_from_transform (mat4x4 mat, vec3 pos, vec3 scale, quat rot) {
 	mat4x4 mat_trans;
 	mat4x4_identity(mat_trans);
-	mat4x4_translate(mat_trans, vec_trans[0], vec_trans[1], vec_trans[2]);
+	mat4x4_translate(mat_trans, pos[0], pos[1], pos[2]);
 	
 	mat4x4 mat_scale;
-	vec3 vec_one = { 1, 1, 1 };
 	mat4x4_identity(mat_scale);
-	mat_scale[0][0] = vec_scale[0];
-	mat_scale[1][1] = vec_scale[1];
-	mat_scale[2][2] = vec_scale[2];
+	mat_scale[0][0] = scale[0];
+	mat_scale[1][1] = scale[1];
+	mat_scale[2][2] = scale[2];
 
 	mat4x4 mat_rot;
 	mat4x4_from_quat(mat_rot, rot);
 
 	// V = S*R*T = S*(R*T)
-	mat4x4 mat_view;
-	mat4x4_mul(mat_view, mat_trans, mat_rot);	
-	mat4x4_mul(mat_view, mat_view, mat_scale);	
-
-	int projectionLocation = glGetUniformLocation(shaderProgram, "projection");
-	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, (const GLfloat*) mat_ortho);
-	int model_viewLocation = glGetUniformLocation(shaderProgram, "model_view");
-	glUniformMatrix4fv(model_viewLocation, 1, GL_FALSE, (const GLfloat*) mat_view);
-	int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-	glUniform4f(vertexColorLocation, color[0], color[1], color[2], color[3]);
-
-	// render the triangle
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	mat4x4_mul(mat, mat_trans, mat_rot);	
+	mat4x4_mul(mat, mat, mat_scale);	
 }
 
-void game_render (GLFWwindow *window, int shader, GameState *gst) {
-	WindowOpt *opt = (WindowOpt*) glfwGetWindowUserPointer(window);
+void render_mesh (int shaderProgram, Mesh *mesh, mat4x4 mat_persp, mat4x4 cam, 
+	vec3 vec_trans, vec3 vec_scale, quat rot, vec4 color, vec3 light) 
+{
+	mat4x4 mat_view;
+	mat_from_transform(mat_view, vec_trans, vec_scale, rot);
+
+	int projectionLocation = glGetUniformLocation(shaderProgram, "projection");
+	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, (const GLfloat*) mat_persp);
+	int model_viewLocation = glGetUniformLocation(shaderProgram, "model_view");
+	glUniformMatrix4fv(model_viewLocation, 1, GL_FALSE, (const GLfloat*) mat_view);
+	int camLocation = glGetUniformLocation(shaderProgram, "cam");
+	glUniformMatrix4fv(camLocation, 1, GL_FALSE, (const GLfloat*) cam);
+	int objectColorLocation = glGetUniformLocation(shaderProgram, "objectColor");
+	glUniform3f(objectColorLocation, color[0], color[1], color[2]);
+	int lightColorLocation = glGetUniformLocation(shaderProgram, "lightColor");
+	glUniform3f(lightColorLocation, 1, 1, 1);
+	int lightPosLocation = glGetUniformLocation(shaderProgram, "lightPos");
+	glUniform3f(lightPosLocation, light[0], light[1], light[2]);
+	
+    glBindVertexArray(mesh->VAO);
+
+	glDrawElements(GL_TRIANGLES, mesh->trigon_num, GL_UNSIGNED_INT, 0);
+}
+
+void game_render (GLFWwindow *window, int shader, int shaderterrain, GameState *gst, Mesh *t, Mesh *t2) {
+	WindowOpt *opt = ((WindowPtr*) glfwGetWindowUserPointer(window))->opt;
 
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
 	glDepthFunc(GL_LESS);  
 
-    // be sure to activate the shader before any calls to glUniform
+    // be sure to activate the shader before any acalls to glUniform
     glUseProgram(shader);
 		
-	mat4x4 mat_ortho;
-	mat4x4_ortho(mat_ortho, 0, opt->scr_width, opt->scr_height, 0, 0, 1);
-	for (int y=0; y<8; y++) {
-		for (int x=0; x<8; x++) {
-			int sel_flag = 0;
-			int hover_flag = 0;
-			int mask_flag = 0;
-			if (x+y*8==gst->sel) { sel_flag = 1; }
-			if (x+y*8==gst->hover) { hover_flag = 1; }
-			for (int i=0; i<6; i++) {
-				if (x+y*8==gst->mask[i]) { mask_flag = 1; }
-			}
-				
-			float vec_trans[3] = {
-				(float)(x-3.5)*52+10 + opt->scr_width/2, 
-				(float)(y-3.5)*52+10 + opt->scr_height/2, 
-				-0.5+hover_flag*0.25
-			};
-			float vec_scale[3] = {
-				1+hover_flag*0.1, 
-				1+hover_flag*0.1, 
-				1
-			};
-			float color[4];
-			switch(gst->board.cell[x][y]) {
-				case 0: color[0] = 0.7f; color[1]= 0.7f; color[2] = 0.7f; break;
-				case 1: color[0] = 1.0f; color[1]= 0.5f; color[2] = 0.0f; break;
-				case 2: color[0] = 1.0f; color[1]= 0.0f; color[2] = 0.0f; break;
-			}
-			if (sel_flag) { for (int c=0; c<3; color[c]=(2+color[c])/3, c++); }
-			if (hover_flag) { for (int c=0; c<3; color[c]=1, c++); }
-			if (mask_flag) { for (int c=0; c<3; color[c]=(0.7+color[c])/1.7f, c++); }
-			color[3] = 1.0f;
+	mat4x4 mat_persp;
+	mat4x4_perspective(mat_persp, 1.0f, (float)opt->scr_width/opt->scr_height, 0.1f, 1000.0f);
 
-			quat rot;
-			quat_identity(rot);
-			if (hover_flag) { 
-				quat_rotate(rot, gst->rot, (float[]){ 0, 0, 1 });
-			}
-
-			render_quad(shader, mat_ortho, vec_trans, vec_scale, rot, color);
-		}
-	}
-	int turn_flag = 0;
-	if (gst->turn%2==1) turn_flag = 1;
-	float vec_trans[3] = {
-		(float)(-4.5)*52 + opt->scr_width/2, 
-		(float)(-3.5+7*(1-turn_flag))*52+10 + opt->scr_height/2, 
-		-0.5
-	};
+	mat4x4 cam;
+	vec3 center; vec3_add(center, gst->cam_pos, gst->cam_forward);
+	mat4x4_look_at(cam, gst->cam_pos, center, gst->cam_up);
+	
+	float vec_trans[3] = { -2, 0, 5 };
 	float vec_scale[3] = { 1, 1, 1 };
-	float color[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
-	if (turn_flag) { color[0] = 1.0f; color[1]= 0.5f; color[2] = 0.0f; }
+	float color[4] = { 1.0f, 0.5f, 0.0f, 1.0f };
 	quat rot; quat_identity(rot); 
-	render_quad(shader, mat_ortho, vec_trans, vec_scale, rot, color);
-		
-	for(int i=0; i<gst->score[0]; i++) {
-		float vec_trans[3] = {
-			(float)(4.5)*52+5 + opt->scr_width/2, 
-			(float)(3.5)*52-((float)i)*26+22 + opt->scr_height/2,  
-			-0.5
-		};
-		float vec_scale[3] = { 0.5, 0.5, 1 };
-		float color[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
-		quat rot; quat_identity(rot); 
-		render_quad(shader, mat_ortho, vec_trans, vec_scale, rot, color);
-	}
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	render_mesh(shader, t, mat_persp, cam, vec_trans, vec_scale, rot, color, gst->light_pos);
+	/*
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	float _color[4] = { 0.5f, 0.0f, 0.0f, 1.0f };
+	render_mesh(shader, t, mat_persp, cam, vec_trans, vec_scale, rot, _color);*/
 
-	for(int i=0; i<gst->score[1]; i++) {
-		float vec_trans[3] = {
-			(float)(4.5)*52+5 + opt->scr_width/2, 
-			(float)(-3.5)*52+((float)i)*26-2 + opt->scr_height/2, 
-			-0.5
-		};
-		float vec_scale[3] = { 0.5, 0.5, 1 };
-		float color[4] = { 1.0f, 0.5f, 0.0f, 1.0f };
-		quat rot; quat_identity(rot); 
-		render_quad(shader, mat_ortho, vec_trans, vec_scale, rot, color);
-	}
+	float vec_trans2[3] = { 0, 0, 0 };
+	float vec_scale2[3] = { 1, 1, 1 };
+	float color2[4] = { 1.0f, 0.5f, 0.0f, 1.0f };
+	quat rot2; quat_identity(rot2); 
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	
+	render_mesh(shader, t2, mat_persp, cam, vec_trans2, vec_scale2, rot2, color2, gst->light_pos);
+	/*
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	float _color2[4] = { 0.5f, 0.0f, 0.0f, 1.0f };
+	render_mesh(shader, t, mat_persp, cam, vec_trans2, vec_scale2, rot2, _color2);*/
+
+
 }

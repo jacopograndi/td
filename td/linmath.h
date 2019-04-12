@@ -1,6 +1,7 @@
 #ifndef LINMATH_H
 #define LINMATH_H
 
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #define LINMATH_H_DEFINE_VEC(n) \
@@ -576,6 +577,16 @@ static inline void quat_from_mat4x4(quat q, mat4x4 M)
 	q[2] = (M[p[2]][p[0]] - M[p[0]][p[2]])/(2.f*r);
 	q[3] = (M[p[2]][p[1]] - M[p[1]][p[2]])/(2.f*r);
 }
+
+static inline float deg_to_rad (float deg) {
+	return deg/180.0f*M_PI;
+}
+
+static inline float rad_to_deg (float rad) {
+	return rad/M_PI*180.0f;
+}
+
+
 /*
 static inline void slerp(quat v0, quat v1, double t) {
     // Only unit quaternions are valid rotations.

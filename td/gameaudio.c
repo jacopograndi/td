@@ -83,7 +83,7 @@ void gameaudio_init(GameAudioData *data) {
     err = Pa_Initialize();
     if( err != paNoError ) 
 		printf("Error: No default output device.\n");
-    printf("PortAudio Test: output device = %d\n", OUTPUT_DEVICE );
+    // printf("PortAudio Test: output device = %d\n", OUTPUT_DEVICE );
 
     outputParameters.device = OUTPUT_DEVICE;
     if (outputParameters.device == paNoDevice) {

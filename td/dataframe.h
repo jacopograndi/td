@@ -1,29 +1,40 @@
 #ifndef dataframeh
 #define dataframeh
 
+#include "gameinput.h"
+#include "linmath.h"
+
 typedef struct windowOpt {
 	int scr_width;
-	int scr_height;
+	int scr_height; 
 } WindowOpt;
 
-typedef struct board {
-	int cell[8][8];
-} Board;
+typedef struct windowPtr {
+	WindowOpt *opt;
+	GameInput *com;
+	float delta_time;
+	float last_frame;
+} WindowPtr;
+
+typedef struct {
+	float *hmap;
+} Terrain;
+
+typedef struct {
+	float pos[2];
+	int id;
+} Unit;
 
 typedef struct gameState {
-	Board board;
-	int hover;
-	int sel;
-	int turn;
-	double aitime;
-	int aimove_flag;
-	int player_check_stalemate_flag;
-	int aimove_sel[2];
-	int win;
-	double win_reset_time;
-	int score[2];
-	int mask[6];
-	double rot;
+	Unit units[1024];
+	int unitsnum;
+	Terrain terrain;
+	vec3 cam_forward;
+	vec3 cam_up;
+	vec3 cam_pos;
+	float cam_yaw;
+	float cam_pitch;
+	vec3 light_pos;
 } GameState;
 
 #endif
