@@ -15,8 +15,9 @@ DYNAMIC_ARRAY_DEFINE(Vertex);
 typedef struct {
 	char *name;
 	unsigned int VAO;
+	unsigned int VBO;
 	dyn_arr_Vertex verts; 
-	int trigon_num;
+	dyn_arr_int indexes;
 } Mesh;
 
 Mesh* model_load (char *filename);

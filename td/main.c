@@ -23,8 +23,7 @@ enum bool { false, true };
 #include "wavelib.h"
 
 
-int main()
-{
+int main() {
 	// gameaudio
 	GameAudioData ga_data;
 	gameaudio_init(&ga_data);
@@ -39,8 +38,8 @@ int main()
 	init_shader(&shaderProgram, "vertex.glsl", "fragment.glsl");
 
 	// vaos, vbos, ebos (models)
-	Mesh *t = model_load("test.obj");
-	Mesh *t2 = model_load("cube2.obj");
+	Mesh *t = model_load("cube.obj");
+	Mesh *t2 = model_load("test.obj");
 
 	WindowOpt opt;
 	opt.scr_width = 900;
@@ -77,10 +76,7 @@ int main()
         glfwSwapBuffers(window);
     }
 
-    // glfw: terminate, clearing all previously allocated GLFW resources.
-    // ------------------------------------------------------------------
     glfwTerminate();
-
 	gameaudio_quit();
 
     return 0;

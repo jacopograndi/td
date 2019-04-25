@@ -31,8 +31,8 @@ void game_process (GLFWwindow* window, GameState *gst, GameInput *com) {
 	WindowOpt *opt = ptr->opt;
 
 	float time = glfwGetTime();
-	gst->light_pos[0] = cos(time);
-	gst->light_pos[1] = sin(time);
+	gst->light_pos[0] = cos(time)*3;
+	gst->light_pos[1] = sin(time)*3;
 
 	float cam_speed = ptr->delta_time * 6;
 

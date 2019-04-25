@@ -20,7 +20,7 @@ static inline void dyn_arr_##type##_check (dyn_arr_##type *dyn, int i) { \
 		dyn->size *= 2; \
 		dyn->arr = realloc(dyn->arr, sizeof(type)*dyn->size); \
 	} \
-	dyn->cur = i; \
+	dyn->cur = i+1; \
 } \
 static inline void dyn_arr_##type##_free (dyn_arr_##type *dyn) { \
 	dyn->size = 0; \

@@ -1,0 +1,22 @@
+0.1 CURRENT FEATURES:
+rendering any obj file with lighting, first person camera, audio playback
+
+WORKING:
+rendering (glsl)
+mesh loading (obj wavefront)
+lighting (point, ambient)
+audio loading (wave)
+audio playback engine (portlib)
+math library (linmath)
+keyboard and mouse input (glfw)
+
+MISSING:
+raytracing
+font
+gui
+scene management
+physics engine
+timestep
+images loading
+images rendering
+networking

@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #include "model.h"
-#define DEBUG_MODEL 0
+#define DEBUG_MODEL 1
 
 //@ ensures: transform str[start:end] in float;
 float str_to_float(char *str, int start, int end) {
@@ -37,8 +37,6 @@ int str_to_int (char *str, int start, int end) {
 	}
 	return res;
 }
-
-
 
 Mesh* model_load (char *filename) {
 	// construct cwd full path
@@ -103,7 +101,7 @@ Mesh* model_load (char *filename) {
 				for (int i=marker_tag+1, j=0; i<=index; i++) {
 					if (line[i] == ' ' && j<2) { tag[j]=i; j++; }
 				}
-				float vx = str_to_float(line, 2, tag[0]);
+				float vx = str_to_float(line, 3, tag[0]);
 				float vy = str_to_float(line, tag[0]+1, tag[1]);
 				float vz = str_to_float(line, tag[1]+1, index);
 				dyn_arr_float_check(&(norm), vn_i);
@@ -127,7 +125,7 @@ Mesh* model_load (char *filename) {
 					if (line[i] == ' ' && tagnum<3) { 
 						tag[tagnum]=i; tagnum++; 
 					}
-				} tag[tagnum]=index-1; tagnum++;
+				} tag[tagnum]=index; tagnum++;
 				for (int i=0; i<tagnum-1; i++) {
 					int tagsn=0;
 					for (int k=tag[i]; k<tag[i+1]; k++) {
@@ -142,9 +140,15 @@ Mesh* model_load (char *filename) {
 					dyn_arr_int_check(&(normindexes), ni_i);
 					normindexes.arr[ni_i] = str_to_int(line, tagslash[i][1]+1, tag[i+1])-1; ni_i++;
 					if (DEBUG_MODEL) {
+						line[index]='\0';
+						printf("%s\n", line);
 						char str0[10]; int k;
 						for (k=0; k<tagslash[i][0]-tag[i]-1; str0[k]=line[k+tag[i]+1], k++); str0[k++]='\0';
 						printf("f=%s->%d\n", str0, faces.arr[f_i-1]);
+						char str1[10];
+						for (k=0; k<tag[i+1]-tagslash[i][1]-1; str1[k]=line[k+tagslash[i][1]+1], k++); str1[k++]='\0';
+						printf("fn=%s->%d, %d,%d\n", str1, normindexes.arr[f_i-1], tag[i+1], tagslash[i][1]);
+						printf("\n");
 					}
 				}
 				if (DEBUG_MODEL) { printf("\n"); }
@@ -154,32 +158,39 @@ Mesh* model_load (char *filename) {
 			line[index] = rch; index++;
 		}
 	} 
-	fclose(file);
-
-	faces.cur++; // get last
-	poss.cur++; // get last
-	norm.cur++; // get last
-	normindexes.cur++; // get last
+	fclose(file);	
+	
+	if (DEBUG_MODEL) { 
+		printf("poss cur: %d\n", poss.cur);
+		printf("norm cur: %d\n", norm.cur);
+		printf("faces cur: %d\n", faces.cur);
+	}
 
 	// construct vertex array
+	dyn_arr_int_init(&(mesh->indexes));
+
 	dyn_arr_Vertex_init(&(mesh->verts));
-	for (int i=0; i<=poss.cur/3; i++) {
-		dyn_arr_Vertex_check(&(mesh->verts), i);
-		for (int j=0;j<3;j++) mesh->verts.arr[i].pos[j] = poss.arr[i*3+j];
-		for (int f=0;f<faces.cur;f++) {
-			if (f==i) { 
-				for (int j=0;j<3;j++) 
-					mesh->verts.arr[i].norm[j] = norm.arr[normindexes.arr[f]*3+j];
-				break;
-			}
+	for (int i=0; i<faces.cur; i++) {
+		if (DEBUG_MODEL) { 
+			printf("i=%d, faces[i]=%d\n", i, faces.arr[i]);
+			for (int j=0;j<3;j++) printf("%f,", poss.arr[faces.arr[i]*3+j]);
 		}
+		dyn_arr_int_check(&(mesh->indexes), i);
+		mesh->indexes.arr[i] = i;
+		dyn_arr_Vertex_check(&(mesh->verts), i);
+		for (int j=0;j<3;j++) mesh->verts.arr[i].pos[j] = poss.arr[faces.arr[i]*3+j];
+		for (int j=0;j<3;j++) mesh->verts.arr[i].norm[j] = norm.arr[normindexes.arr[i]*3+j];
 		for (int j=0;j<2;j++) mesh->verts.arr[i].tex[j] = 0;
+		if (DEBUG_MODEL) { 
+			printf("\n");
+		}
 	}
+
+
 	
-	printf("poss cur: %d\n", poss.cur);
-	printf("verts cur: %d\n", mesh->verts.cur);
-	printf("norm cur: %d\n", norm.cur);
-	printf("faces cur: %d\n", faces.cur);
+	if (DEBUG_MODEL) { 
+		printf("verts cur: %d\n", mesh->verts.cur);
+	}
 
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -191,7 +202,7 @@ Mesh* model_load (char *filename) {
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*mesh->verts.cur, mesh->verts.arr, GL_STATIC_DRAW);
 	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, faces.cur * sizeof(unsigned int), faces.arr, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indexes.cur * sizeof(unsigned int), mesh->indexes.arr, GL_STATIC_DRAW);
 
 	// vertex positions
     glEnableVertexAttribArray(0);	
@@ -205,7 +216,7 @@ Mesh* model_load (char *filename) {
 
     glBindVertexArray(VAO);
 	mesh->VAO = VAO;
-	mesh->trigon_num = faces.cur;
+	mesh->VBO = VBO;
 	return mesh; 
 }
 

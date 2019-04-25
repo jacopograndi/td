@@ -45,7 +45,7 @@ void render_mesh (int shaderProgram, Mesh *mesh, mat4x4 mat_persp, mat4x4 cam,
 	
     glBindVertexArray(mesh->VAO);
 
-	glDrawElements(GL_TRIANGLES, mesh->trigon_num, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, mesh->indexes.cur, GL_UNSIGNED_INT, 0);
 }
 
 void game_render (GLFWwindow *window, int shader, int shaderterrain, GameState *gst, Mesh *t, Mesh *t2) {
@@ -65,7 +65,7 @@ void game_render (GLFWwindow *window, int shader, int shaderterrain, GameState *
 	vec3 center; vec3_add(center, gst->cam_pos, gst->cam_forward);
 	mat4x4_look_at(cam, gst->cam_pos, center, gst->cam_up);
 	
-	float vec_trans[3] = { -2, 0, 5 };
+	float vec_trans[3] = { 0, 0, 0 };
 	float vec_scale[3] = { 1, 1, 1 };
 	float color[4] = { 1.0f, 0.5f, 0.0f, 1.0f };
 	quat rot; quat_identity(rot); 
@@ -76,16 +76,18 @@ void game_render (GLFWwindow *window, int shader, int shaderterrain, GameState *
 	float _color[4] = { 0.5f, 0.0f, 0.0f, 1.0f };
 	render_mesh(shader, t, mat_persp, cam, vec_trans, vec_scale, rot, _color);*/
 
-	float vec_trans2[3] = { 0, 0, 0 };
-	float vec_scale2[3] = { 1, 1, 1 };
-	float color2[4] = { 1.0f, 0.5f, 0.0f, 1.0f };
-	quat rot2; quat_identity(rot2); 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	
-	render_mesh(shader, t2, mat_persp, cam, vec_trans2, vec_scale2, rot2, color2, gst->light_pos);
 	/*
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	float _color2[4] = { 0.5f, 0.0f, 0.0f, 1.0f };
-	render_mesh(shader, t, mat_persp, cam, vec_trans2, vec_scale2, rot2, _color2);*/
-
+	for (int x=0; x<100; x++) for (int y=0; y<100; y++) {
+		float vec_trans2[3] = { x*2-100, y*2-100, 0 };
+		float vec_scale2[3] = { 1, 1, 1 };
+		float color2[4] = { 1.0f, 0.5f, 0.0f, 1.0f };
+		quat rot2; quat_identity(rot2); 
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	
+		render_mesh(shader, t2, mat_persp, cam, vec_trans2, vec_scale2, rot2, color2, gst->light_pos);
+		
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		float _color2[4] = { 0.5f, 0.0f, 0.0f, 1.0f };
+		render_mesh(shader, t, mat_persp, cam, vec_trans2, vec_scale2, rot2, _color2);
+	}*/
 
 }
