@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-#define ARRAY_SIZE 64
+#define ARRAY_SIZE 1
 
 #define DYNAMIC_ARRAY_DEFINE(type) \
 typedef struct {\

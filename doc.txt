@@ -9,12 +9,12 @@ audio loading (wave)
 audio playback engine (portlib)
 math library (linmath)
 keyboard and mouse input (glfw)
+raytracing
 
 MISSING:
-raytracing
+scene management
 font
 gui
-scene management
 physics engine
 timestep
 images loading

@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #include "model.h"
-#define DEBUG_MODEL 1
+#define DEBUG_MODEL 0
 
 //@ ensures: transform str[start:end] in float;
 float str_to_float(char *str, int start, int end) {

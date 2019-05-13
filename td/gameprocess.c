@@ -23,7 +23,8 @@ void game_init (GLFWwindow* window, GameState *gst) {
 		}
 	}*/
 
-	gst->light_pos[0] = 0; gst->light_pos[1] = 0; gst->light_pos[2] = 0; 
+	gst->light_pos[0] = 0; gst->light_pos[1] = 1; gst->light_pos[2] = 0; 
+	dyn_arr_GameElement_init(&gst->gameElements);
 }
 
 void game_process (GLFWwindow* window, GameState *gst, GameInput *com) {
@@ -32,7 +33,7 @@ void game_process (GLFWwindow* window, GameState *gst, GameInput *com) {
 
 	float time = glfwGetTime();
 	gst->light_pos[0] = cos(time)*3;
-	gst->light_pos[1] = sin(time)*3;
+	gst->light_pos[2] = sin(time)*3;
 
 	float cam_speed = ptr->delta_time * 6;
 
@@ -83,5 +84,22 @@ void game_process (GLFWwindow* window, GameState *gst, GameInput *com) {
 	if (com->keypress[2]) {
 		vec3 dp; vec3_scale(dp, gst->cam_forward, cam_speed);
 		vec3_sub(gst->cam_pos, gst->cam_pos, dp);
+	}
+
+	if (com->mousepress[0] == 1) {
+		vec3 outPoint; Mesh *mesh; int hitFlag = 0;
+		for (int i=0; i<gst->gameElements.cur; i++) {
+			mesh = gst->gameElements.arr[i].mesh;
+			for (int j=0; j<mesh->verts.cur; j+=3) {
+				// these vertices has to be translated, rotated and scaled!
+				hitFlag = raytrace_trigon(gst->cam_pos, gst->cam_forward, 
+					mesh->verts.arr[j].pos, mesh->verts.arr[j+1].pos, mesh->verts.arr[j+2].pos,
+					&outPoint	
+				);
+				if (hitFlag == 1) {
+					printf("hit at: %.2f, %.2f, %.2f!\n", outPoint);
+				}
+			}
+		}
 	}
 }

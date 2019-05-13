@@ -38,8 +38,7 @@ int main() {
 	init_shader(&shaderProgram, "vertex.glsl", "fragment.glsl");
 
 	// vaos, vbos, ebos (models)
-	Mesh *t = model_load("cube.obj");
-	Mesh *t2 = model_load("test.obj");
+	Mesh *mesh0 = model_load("tower.obj");
 
 	WindowOpt opt;
 	opt.scr_width = 900;
@@ -55,6 +54,13 @@ int main() {
 
 	GameState gst;
 	game_init (window, &gst);
+	dyn_arr_GameElement_init(&gst.gameElements);
+	dyn_arr_GameElement_check(&gst.gameElements, 0);
+	gst.gameElements.arr[0].mesh = mesh0;
+	for(int i=0; i<3; gst.gameElements.arr[0].pos[i]=0, i++);
+	for(int i=0; i<3; gst.gameElements.arr[0].scale[i]=1, i++);
+	for(int i=0; i<4; gst.gameElements.arr[0].rot[i]=0, i++);
+	gst.gameElements.arr[0].rot[3]=1;
 
     // render loop
     // -----------
@@ -71,9 +77,10 @@ int main() {
 		game_process (window, &gst, &com);
 
         // render
-        game_render(window, shaderProgram, shaderTerrain, &gst, t, t2);
+        game_render(window, shaderProgram, shaderTerrain, &gst);
 
         glfwSwapBuffers(window);
+
     }
 
     glfwTerminate();

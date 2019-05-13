@@ -3,6 +3,8 @@
 
 #include "gameinput.h"
 #include "linmath.h"
+#include "model.h"
+#include "dynamic_array.h"
 
 typedef struct windowOpt {
 	int scr_width;
@@ -16,19 +18,17 @@ typedef struct windowPtr {
 	float last_frame;
 } WindowPtr;
 
-typedef struct {
-	float *hmap;
-} Terrain;
+typedef struct gameElement {
+	Mesh *mesh;
+	vec3 pos;
+	vec3 scale;
+	quat rot;
+} GameElement;
 
-typedef struct {
-	float pos[2];
-	int id;
-} Unit;
+DYNAMIC_ARRAY_DEFINE(GameElement)
 
 typedef struct gameState {
-	Unit units[1024];
-	int unitsnum;
-	Terrain terrain;
+	dyn_arr_GameElement gameElements;
 	vec3 cam_forward;
 	vec3 cam_up;
 	vec3 cam_pos;
