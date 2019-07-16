@@ -10,9 +10,9 @@ audio playback engine (portlib)
 math library (linmath)
 keyboard and mouse input (glfw)
 raytracing
+scene management
 
 MISSING:
-scene management
 font
 gui
 physics engine

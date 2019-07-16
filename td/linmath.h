@@ -588,7 +588,7 @@ static inline float rad_to_deg (float rad) {
 
 static inline int raytrace_trigon (vec3 rayOrigin, vec3 rayVector, 
 	vec3 vertex0, vec3 vertex1, vec3 vertex2,
-	vec3* outIntersectionPoint) 
+	vec3 outIntersectionPoint) 
 {
     const float EPSILON = 0.0000001;
     vec3 edge1, edge2, h, s, q;
@@ -613,7 +613,7 @@ static inline int raytrace_trigon (vec3 rayOrigin, vec3 rayVector,
     if (t > EPSILON) // ray intersection
     {
 		vec3 scaled; vec3_scale(scaled, rayVector, t);
-		vec3_add(&outIntersectionPoint, rayOrigin, scaled);
+		vec3_add(outIntersectionPoint, rayOrigin, scaled);
         return 1;
     }
     else // This means that there is a line intersection but not a ray intersection.

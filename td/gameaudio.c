@@ -104,10 +104,10 @@ void gameaudio_init(GameAudioData *data) {
         paNoFlag,
         gameaudio_callback,
         data );
-	if( err != paNoError ) printf( "PortAudio error: %s\n", Pa_GetErrorText( err ) );
+	if( err != paNoError ) printf( "PortAudio open error: %s\n", Pa_GetErrorText( err ) );
 
 	err = Pa_StartStream( stream );
-	if( err != paNoError ) printf( "PortAudio error: %s\n", Pa_GetErrorText( err ) );
+	if( err != paNoError ) printf( "PortAudio start error: %s\n", Pa_GetErrorText( err ) );
 }
 
 void gameaudio_quit() {

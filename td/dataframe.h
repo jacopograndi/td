@@ -22,12 +22,14 @@ typedef struct gameElement {
 	Mesh *mesh;
 	vec3 pos;
 	vec3 scale;
+	vec4 color;
 	quat rot;
 } GameElement;
 
 DYNAMIC_ARRAY_DEFINE(GameElement)
 
 typedef struct gameState {
+	Mesh *meshes[1024];
 	dyn_arr_GameElement gameElements;
 	vec3 cam_forward;
 	vec3 cam_up;

@@ -86,20 +86,53 @@ void game_process (GLFWwindow* window, GameState *gst, GameInput *com) {
 		vec3_sub(gst->cam_pos, gst->cam_pos, dp);
 	}
 
-	if (com->mousepress[0] == 1) {
+	if (com->mousepress[0] == 1 ||1) {
 		vec3 outPoint; Mesh *mesh; int hitFlag = 0;
-		for (int i=0; i<gst->gameElements.cur; i++) {
+		vec3 normCam;  vec3_norm(normCam, gst->cam_forward);
+		vec3 hits[128]; int hitsnum = 0;
+		for (int i=0; i<1; i++) { // check only the first element
 			mesh = gst->gameElements.arr[i].mesh;
 			for (int j=0; j<mesh->verts.cur; j+=3) {
-				// these vertices has to be translated, rotated and scaled!
-				hitFlag = raytrace_trigon(gst->cam_pos, gst->cam_forward, 
+				hitFlag = raytrace_trigon(gst->cam_pos, normCam,
 					mesh->verts.arr[j].pos, mesh->verts.arr[j+1].pos, mesh->verts.arr[j+2].pos,
-					&outPoint	
+					outPoint	
 				);
 				if (hitFlag == 1) {
-					printf("hit at: %.2f, %.2f, %.2f!\n", outPoint);
+					for (int k = 0; k < 3; k++)  hits[hitsnum][k] = outPoint[k];
+					hitsnum++;
 				}
 			}
+		}
+		if (hitsnum > 0) {
+			vec3 diff;
+			int numviz = 0;
+			float maxdist = 100000000.0f; int imax = 0; float dist = 0;
+			for (int k = 0; k < hitsnum; k++) {
+				vec3_sub(diff, hits[k], gst->cam_pos);
+				dist = vec3_mul_inner(diff, diff);
+				if (dist < maxdist) {
+					maxdist = dist; imax = k;
+				}
+				dyn_arr_GameElement_check(&gst->gameElements, 1 + numviz);
+				gst->gameElements.arr[1+numviz].mesh = gst->meshes[1];
+				for (int i = 0; i < 3; gst->gameElements.arr[1 + numviz].pos[i] = hits[k][i], i++);
+				for (int i = 0; i < 3; gst->gameElements.arr[1 + numviz].scale[i] = 0.1f, i++);
+				for (int i = 0; i < 4; gst->gameElements.arr[1 + numviz].rot[i] = 0, i++);
+				gst->gameElements.arr[1 + numviz].rot[3] = 1;
+				float color0[4] = { 1.0f, 1.0f, 0.0f, 1.0f };
+				for (int i = 0; i < 4; gst->gameElements.arr[1 + numviz].color[i] = color0[i], i++);
+				numviz++;
+			}
+			dyn_arr_GameElement_check(&gst->gameElements, 1 + numviz);
+			gst->gameElements.arr[1 + numviz].mesh = gst->meshes[1];
+			for (int i = 0; i < 3; gst->gameElements.arr[1 + numviz].pos[i] = hits[imax][i], i++);
+			for (int i = 0; i < 3; gst->gameElements.arr[1 + numviz].scale[i] = 0.08f, i++);
+			for (int i = 0; i < 4; gst->gameElements.arr[1 + numviz].rot[i] = 0, i++);
+			gst->gameElements.arr[1 + numviz].rot[3] = 1;
+			float color1[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+			for (int i = 0; i < 4; gst->gameElements.arr[1 + numviz].color[i] = color1[i], i++);
+
+			//for (int k = 0; k < 3; k++) gst->gameElements.arr[1].pos[k] = hits[imax][k];
 		}
 	}
 }

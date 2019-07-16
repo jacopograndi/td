@@ -66,11 +66,10 @@ void game_render (GLFWwindow *window, int shader, int shaderterrain, GameState *
 	mat4x4_look_at(cam, gst->cam_pos, center, gst->cam_up);
 	
 	for (int i=0; i<gst->gameElements.cur; i++) {
-		float color[4] = { 1.0f, 0.5f, 0.0f, 1.0f };
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		render_mesh(shader, gst->gameElements.arr[i].mesh, mat_persp, cam, 
 			gst->gameElements.arr[i].pos, gst->gameElements.arr[i].scale, 
-			gst->gameElements.arr[i].rot, color, gst->light_pos);
+			gst->gameElements.arr[i].rot, gst->gameElements.arr[i].color, gst->light_pos);
 		/*
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		float _color[4] = { 0.5f, 0.0f, 0.0f, 1.0f };
