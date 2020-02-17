@@ -8,7 +8,7 @@ typedef struct gameInput {
 	double last_ypos;
 	int first_mouse_flag;
 	int mousepress[3];
-	int keypress[4];
+	int keypress[5];
 } GameInput;
 
 void input_init (GLFWwindow *window, GameInput *com);

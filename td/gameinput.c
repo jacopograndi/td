@@ -22,6 +22,12 @@ void keyboard_callback(GLFWwindow *window)
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		com->keypress[3] = 1;
 	}
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		com->keypress[4] = 1;
+	}
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
+		com->keypress[4] = 0;
+	}
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_RELEASE) {
 		com->keypress[0] = 0;
 	}

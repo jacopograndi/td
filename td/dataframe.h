@@ -34,6 +34,7 @@ typedef struct gameState {
 	vec3 cam_forward;
 	vec3 cam_up;
 	vec3 cam_pos;
+	vec3 cam_vel;
 	float cam_yaw;
 	float cam_pitch;
 	vec3 light_pos;

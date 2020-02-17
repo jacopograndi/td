@@ -55,9 +55,15 @@ int main() {
     int shaderProgram = 0, shaderTerrain = 0;
 	init_shader(&shaderProgram, "vertex.glsl", "fragment.glsl");
 
-	// images 
-	//int width, height, nrChannels;
-	//unsigned char *data = stbi_load("imgs/test.png", &width, &height, &nrChannels, 0); 
+	int width, height, nrChannels;
+	unsigned char *data = stbi_load("imgs/test.png", &width, &height, &nrChannels, 0);
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	// raw data cleanup
+	stbi_image_free(data);
 
 	WindowOpt opt;
 	opt.scr_width = 900;
@@ -73,7 +79,7 @@ int main() {
 
 	GameState gst;
 	game_init (window, &gst);
-	gst.meshes[0] = model_load("photo.obj");;
+	gst.meshes[0] = model_load("playground.obj");;
 	gst.meshes[1] = model_load("cross.obj");;
 
 	dyn_arr_GameElement_init(&gst.gameElements);
@@ -97,6 +103,7 @@ int main() {
 
     // render loop
     // -----------
+	ptr.last_frame = glfwGetTime();
     while (!glfwWindowShouldClose(window)) {
 		float current_frame = glfwGetTime();
 		ptr.delta_time = current_frame - ptr.last_frame;
@@ -110,7 +117,7 @@ int main() {
 		game_process (window, &gst, &com);
 
         // render
-        game_render(window, shaderProgram, shaderTerrain, &gst);
+        game_render(window, shaderProgram, shaderTerrain, &gst, texture);
 
         glfwSwapBuffers(window);
 

@@ -48,14 +48,16 @@ void render_mesh (int shaderProgram, Mesh *mesh, mat4x4 mat_persp, mat4x4 cam,
 	glDrawElements(GL_TRIANGLES, mesh->indexes.cur, GL_UNSIGNED_INT, 0);
 }
 
-void game_render (GLFWwindow *window, int shader, int shaderterrain, GameState *gst) {
+void game_render (GLFWwindow *window, int shader, int shaderterrain, GameState *gst, 
+	unsigned int texture) 
+{
 	WindowOpt *opt = ((WindowPtr*) glfwGetWindowUserPointer(window))->opt;
 
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
 	glDepthFunc(GL_LESS);  
 
-    // be sure to activate the shader before any acalls to glUniform
+    // be sure to activate the shader before any calls to glUniform
     glUseProgram(shader);
 		
 	mat4x4 mat_persp;
@@ -67,12 +69,9 @@ void game_render (GLFWwindow *window, int shader, int shaderterrain, GameState *
 	
 	for (int i=0; i<gst->gameElements.cur; i++) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glBindTexture(GL_TEXTURE_2D, texture);
 		render_mesh(shader, gst->gameElements.arr[i].mesh, mat_persp, cam, 
 			gst->gameElements.arr[i].pos, gst->gameElements.arr[i].scale, 
 			gst->gameElements.arr[i].rot, gst->gameElements.arr[i].color, gst->light_pos);
-		/*
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		float _color[4] = { 0.5f, 0.0f, 0.0f, 1.0f };
-		render_mesh(shader, t, mat_persp, cam, vec_trans, vec_scale, rot, _color);*/
 	}
 }
