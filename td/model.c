@@ -52,15 +52,16 @@ Mesh* model_load (char *filename) {
 	FILE *file = fopen(fullpath, "r");
 	if (file == NULL) { printf("%s, wrong filename\n", fullpath); return NULL; }
 
-	int v_i=0, f_i=0, vn_i=0, ni_i=0;
+	int v_i=0, f_i=0, vn_i=0, ni_i=0, vt_i=0;
 	Mesh *mesh = malloc(sizeof(Mesh));
 
-	dyn_arr_float poss, norm;
+	dyn_arr_float poss, norm, texs;
 	dyn_arr_int faces, normindexes;
 	dyn_arr_int_init(&(faces));
 	dyn_arr_int_init(&(normindexes));
 	dyn_arr_float_init(&(poss));
 	dyn_arr_float_init(&(norm));
+	dyn_arr_float_init(&(texs));
 
 	char rch; char line[1024]; int index = 0;
 	int marker_tag = 0;
@@ -88,12 +89,33 @@ Mesh* model_load (char *filename) {
 				dyn_arr_float_check(&(poss), v_i);
 				poss.arr[v_i] = vz; v_i++;
 				if (DEBUG_MODEL) {
-					char str0[10], str1[10], str2[10]; int k;
+					char str0[20], str1[20], str2[20]; int k;
 					for (k=0; k<tag[0]-2; str0[k]=line[k+2], k++); str0[k++]='\0';
 					for (k=0; k<tag[1]-tag[0]-1; str1[k]=line[k+tag[0]+1], k++); str1[k++]='\0';
 					for (k=0; k<index-tag[1]-1; str2[k]=line[k+tag[1]+1], k++); str2[k++]='\0';
 					printf("v= %s, %s, %s\n", str0, str1, str2);
 					printf("-> %f, %f, %f\n\n", vx, vy, vz);
+				}
+			}
+			if (marker_tag == 2 && line[0] == 'v' && line[1] == 't') { // vertex textures
+				int tag[5];
+				for (int i=marker_tag+1,j=0; i<=index; i++) {
+					if (line[i]==' '&&j<1) { tag[j]=i; j++; }
+				}
+				float vx = str_to_float(line, 3, tag[0]);
+				float vy = str_to_float(line, tag[0] + 1, index);
+				dyn_arr_float_check(&(texs), vt_i);
+				texs.arr[vt_i] = vx; vt_i++;
+				dyn_arr_float_check(&(texs), vt_i);
+				texs.arr[vt_i] = vy; vt_i++;
+				if (DEBUG_MODEL || 1) {
+					line[index]='\0';
+					printf("tag0= %d, index= %d, %s\n",tag[0], index, line);
+					char str0[20],str1[20]; int k;
+					for (k=0; k<tag[0]-2; str0[k]=line[k+3],k++); str0[k++]='\0';
+					for (k=0; k<index-tag[0]-1; str1[k]=line[k+tag[0]+1],k++); str1[k++]='\0';
+					printf("t= %s, %s\n", str0, str1);
+					printf("-> %f, %f\n\n", vx, vy);
 				}
 			}
 			if (marker_tag == 2 && line[0]=='v' && line[1]=='n') { // normal
@@ -111,11 +133,11 @@ Mesh* model_load (char *filename) {
 				dyn_arr_float_check(&(norm), vn_i);
 				norm.arr[vn_i] = vz; vn_i++;
 				if (DEBUG_MODEL) {
-					char str0[10], str1[10], str2[10]; int k;
-					for (k=0; k<tag[0]-2; str0[k]=line[k+2], k++); str0[k++]='\0';
+					char str0[20], str1[20], str2[20]; int k;
+					for (k=0; k<tag[0]-2; str0[k]=line[k+3], k++); str0[k++]='\0';
 					for (k=0; k<tag[1]-tag[0]-1; str1[k]=line[k+tag[0]+1], k++); str1[k++]='\0';
 					for (k=0; k<index-tag[1]-1; str2[k]=line[k+tag[1]+1], k++); str2[k++]='\0';
-					printf("v= %s, %s, %s\n", str0, str1, str2);
+					printf("n= %s, %s, %s\n", str0, str1, str2);
 					printf("-> %f, %f, %f\n\n", vx, vy, vz);
 				}
 			}
@@ -145,7 +167,7 @@ Mesh* model_load (char *filename) {
 						char str0[10]; int k;
 						for (k=0; k<tagslash[i][0]-tag[i]-1; str0[k]=line[k+tag[i]+1], k++); str0[k++]='\0';
 						printf("f=%s->%d\n", str0, faces.arr[f_i-1]);
-						char str1[10];
+						char str1[20];
 						for (k=0; k<tag[i+1]-tagslash[i][1]-1; str1[k]=line[k+tagslash[i][1]+1], k++); str1[k++]='\0';
 						printf("fn=%s->%d, %d,%d\n", str1, normindexes.arr[f_i-1], tag[i+1], tagslash[i][1]);
 						printf("\n");
@@ -160,10 +182,11 @@ Mesh* model_load (char *filename) {
 	} 
 	fclose(file);	
 	
-	if (DEBUG_MODEL) { 
+	if (DEBUG_MODEL || 1) {
 		printf("poss cur: %d\n", poss.cur);
 		printf("norm cur: %d\n", norm.cur);
 		printf("faces cur: %d\n", faces.cur);
+		printf("texs cur: %d\n", texs.cur);
 	}
 
 	// construct vertex array
@@ -180,7 +203,7 @@ Mesh* model_load (char *filename) {
 		dyn_arr_Vertex_check(&(mesh->verts), i);
 		for (int j=0;j<3;j++) mesh->verts.arr[i].pos[j] = poss.arr[faces.arr[i]*3+j];
 		for (int j=0;j<3;j++) mesh->verts.arr[i].norm[j] = norm.arr[normindexes.arr[i]*3+j];
-		for (int j=0;j<2;j++) mesh->verts.arr[i].tex[j] = 0;
+		for (int j=0;j<2;j++) mesh->verts.arr[i].tex[j] = texs.arr[faces.arr[i]*2+j];
 		if (DEBUG_MODEL) { 
 			printf("\n");
 		}

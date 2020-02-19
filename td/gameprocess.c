@@ -66,12 +66,6 @@ void game_process (GLFWwindow* window, GameState *gst, GameInput *com) {
 	f[2] = sin(deg_to_rad(gst->cam_yaw)) * cos(deg_to_rad(gst->cam_pitch));
 	vec3_norm(f, f);
 
-	vec3 pitchvec;
-	pitchvec[0] = cos(deg_to_rad(gst->cam_yaw));
-	pitchvec[1] = 0;
-	pitchvec[2] = sin(deg_to_rad(gst->cam_yaw));
-	vec3_norm(pitchvec, pitchvec);
-
 
 	vec3 normCam;  vec3_norm(normCam, gst->cam_forward);
 	vec3 dir; vec3_scale(dir, gst->cam_up, -1); vec3 out;
@@ -92,22 +86,15 @@ void game_process (GLFWwindow* window, GameState *gst, GameInput *com) {
 		vec3_add(acc, acc, dp);
 	}
 	if (com->keypress[0]) {
-		vec3 dp; vec3_scale(dp, pitchvec, cam_speed);
+		vec3 dp; vec3_scale(dp, f, cam_speed);
 		vec3_add(acc, acc, dp);
 	}
 	if (com->keypress[2]) {
-		vec3 dp; vec3_scale(dp, pitchvec, cam_speed);
+		vec3 dp; vec3_scale(dp, f, cam_speed);
 		vec3_sub(acc, acc, dp);
 	}
 	if (com->keypress[4] && grounded) {
-		vec3 dir; vec3_norm(dir, gst->cam_up);
-		vec3 dp; vec3_scale(dp, dir, jump_speed);
-		vec3_add(acc, acc, dp);
-	}
-
-	if (!grounded) {
-		vec3 gravity = { 0, -1.0f * ptr->delta_time, 0 };
-		vec3_add(acc, acc, gravity);
+		// space
 	}
 
 	vec3_add(gst->cam_vel, gst->cam_vel, acc);
