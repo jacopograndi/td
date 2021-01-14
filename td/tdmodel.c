@@ -6,7 +6,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "model.h"
+#include "tdmodel.h"
 #define DEBUG_MODEL 0
 
 //@ ensures: transform str[start:end] in float;
@@ -52,13 +52,14 @@ Mesh* model_load (char *filename) {
 	FILE *file = fopen(fullpath, "r");
 	if (file == NULL) { printf("%s, wrong filename\n", fullpath); return NULL; }
 
-	int v_i=0, f_i=0, vn_i=0, ni_i=0, vt_i=0;
+	int v_i=0, f_i=0, vn_i=0, ni_i=0, vt_i=0, ti_i=0;
 	Mesh *mesh = malloc(sizeof(Mesh));
 
 	dyn_arr_float poss, norm, texs;
-	dyn_arr_int faces, normindexes;
+	dyn_arr_int faces, normindexes, texsindexes;
 	dyn_arr_int_init(&(faces));
 	dyn_arr_int_init(&(normindexes));
+	dyn_arr_int_init(&(texsindexes));
 	dyn_arr_float_init(&(poss));
 	dyn_arr_float_init(&(norm));
 	dyn_arr_float_init(&(texs));
@@ -108,7 +109,7 @@ Mesh* model_load (char *filename) {
 				texs.arr[vt_i] = vx; vt_i++;
 				dyn_arr_float_check(&(texs), vt_i);
 				texs.arr[vt_i] = vy; vt_i++;
-				if (DEBUG_MODEL || 1) {
+				if (DEBUG_MODEL) {
 					line[index]='\0';
 					printf("tag0= %d, index= %d, %s\n",tag[0], index, line);
 					char str0[20],str1[20]; int k;
@@ -144,7 +145,7 @@ Mesh* model_load (char *filename) {
 			if (marker_tag == 1 && line[0]=='f') { // face
 				int tag[5], tagslash[4][2], tagnum=0;
 				for (int i=0; i<=index; i++) {
-					if (line[i] == ' ' && tagnum<3) { 
+					if (line[i] == ' ' && tagnum<4) { 
 						tag[tagnum]=i; tagnum++; 
 					}
 				} tag[tagnum]=index; tagnum++;
@@ -159,6 +160,8 @@ Mesh* model_load (char *filename) {
 				for (int i=0; i<tagnum-1; i++) {
 					dyn_arr_int_check(&(faces), f_i);
 					faces.arr[f_i] = str_to_int(line, tag[i]+1, tagslash[i][0])-1; f_i++;
+					dyn_arr_int_check(&(texsindexes),ti_i);
+					texsindexes.arr[ti_i]=str_to_int(line,tagslash[i][0]+1,tagslash[i][1])-1; ti_i++;
 					dyn_arr_int_check(&(normindexes), ni_i);
 					normindexes.arr[ni_i] = str_to_int(line, tagslash[i][1]+1, tag[i+1])-1; ni_i++;
 					if (DEBUG_MODEL) {
@@ -166,10 +169,13 @@ Mesh* model_load (char *filename) {
 						printf("%s\n", line);
 						char str0[10]; int k;
 						for (k=0; k<tagslash[i][0]-tag[i]-1; str0[k]=line[k+tag[i]+1], k++); str0[k++]='\0';
-						printf("f=%s->%d\n", str0, faces.arr[f_i-1]);
+						printf("f =%s->%d\n", str0, faces.arr[f_i-1]);
 						char str1[20];
 						for (k=0; k<tag[i+1]-tagslash[i][1]-1; str1[k]=line[k+tagslash[i][1]+1], k++); str1[k++]='\0';
 						printf("fn=%s->%d, %d,%d\n", str1, normindexes.arr[f_i-1], tag[i+1], tagslash[i][1]);
+						char str2[20]; k=0;
+						for (k=0; k<tagslash[i][0]-tagslash[i][1]-1; str2[k]=line[k+tagslash[i][0]+1],k++); str2[k++]='\0';
+						printf("t =%s->%d, %d,%d\n",str2,texsindexes.arr[f_i-1],tagslash[i][0],tagslash[i][1]);
 						printf("\n");
 					}
 				}
@@ -182,9 +188,10 @@ Mesh* model_load (char *filename) {
 	} 
 	fclose(file);	
 	
-	if (DEBUG_MODEL || 1) {
+	if (DEBUG_MODEL) {
 		printf("poss cur: %d\n", poss.cur);
-		printf("norm cur: %d\n", norm.cur);
+		printf("norm cur: %d\n",norm.cur);
+		printf("normindexes cur: %d\n",normindexes.cur);
 		printf("faces cur: %d\n", faces.cur);
 		printf("texs cur: %d\n", texs.cur);
 	}
@@ -194,22 +201,21 @@ Mesh* model_load (char *filename) {
 
 	dyn_arr_Vertex_init(&(mesh->verts));
 	for (int i=0; i<faces.cur; i++) {
-		if (DEBUG_MODEL) { 
+		if (DEBUG_MODEL) {
+			printf("i=%d, normindexes[i]=%d\n",i,normindexes.arr[i]);
 			printf("i=%d, faces[i]=%d\n", i, faces.arr[i]);
 			for (int j=0;j<3;j++) printf("%f,", poss.arr[faces.arr[i]*3+j]);
 		}
 		dyn_arr_int_check(&(mesh->indexes), i);
 		mesh->indexes.arr[i] = i;
 		dyn_arr_Vertex_check(&(mesh->verts), i);
-		for (int j=0;j<3;j++) mesh->verts.arr[i].pos[j] = poss.arr[faces.arr[i]*3+j];
-		for (int j=0;j<3;j++) mesh->verts.arr[i].norm[j] = norm.arr[normindexes.arr[i]*3+j];
-		for (int j=0;j<2;j++) mesh->verts.arr[i].tex[j] = texs.arr[faces.arr[i]*2+j];
-		if (DEBUG_MODEL) { 
+		for (int j=0; j<3; j++) mesh->verts.arr[i].pos[j]=poss.arr[faces.arr[i]*3+j];
+		for (int j=0; j<3; j++) mesh->verts.arr[i].norm[j]=norm.arr[normindexes.arr[i]*3+j];
+		for (int j=0; j<2; j++) mesh->verts.arr[i].tex[j]=texs.arr[texsindexes.arr[i]*2+j];
+		if (DEBUG_MODEL) {
 			printf("\n");
 		}
 	}
-
-
 	
 	if (DEBUG_MODEL) { 
 		printf("verts cur: %d\n", mesh->verts.cur);
@@ -249,5 +255,14 @@ void model_from_heightmap (int **hmap) {
 		vertices[(y*1024+x)*3] = x;
 		vertices[(y*1024+x)*3+1] = y;
 		vertices[(y*1024+x)*3+2] = hmap[x][y];
+	}
+}
+
+
+void model_verts_flat(float *vs, Mesh* mesh) {
+	for (int i=0; i<mesh->verts.cur; i++) {
+		vs[i*3] = mesh->verts.arr[i].pos[0];
+		vs[i*3+1] = mesh->verts.arr[i].pos[1];
+		vs[i*3+2] = mesh->verts.arr[i].pos[2];
 	}
 }

@@ -578,6 +578,31 @@ static inline void quat_from_mat4x4(quat q, mat4x4 M)
 	q[3] = (M[p[2]][p[1]] - M[p[1]][p[2]])/(2.f*r);
 }
 
+
+static inline void euler_to_quat(quat q, vec3 vec) {
+	float yaw=vec[0],pitch=vec[1],roll=vec[2];
+	q[0]=sin(roll/2)*cos(pitch/2)*cos(yaw/2)-cos(roll/2)*sin(pitch/2)*sin(yaw/2);
+	q[1]=cos(roll/2)*sin(pitch/2)*cos(yaw/2)+sin(roll/2)*cos(pitch/2)*sin(yaw/2);
+	q[2]=cos(roll/2)*cos(pitch/2)*sin(yaw/2)-sin(roll/2)*sin(pitch/2)*cos(yaw/2);
+	q[3]=cos(roll/2)*cos(pitch/2)*cos(yaw/2)+sin(roll/2)*sin(pitch/2)*sin(yaw/2);
+}
+static inline void quat_to_euler(vec3 vec, quat q) {
+	float x=q[0],y=q[1],z=q[2],w=q[3];
+
+	float t0=2.0*(w*x+y*z);
+	float t1=1.0-2.0*(x*x+y*y);
+	vec[2]=atan2(t0,t1);
+
+	float t2=2.0*(w*y-z*x);
+	if (t2>1) { t2=1; }
+	if (t2<1) { t2=-1; }
+	vec[1]=asin(t2);
+
+	float t3=2.0*(w*z+x*y);
+	float t4=+1.0-2.0*(y*y+z*z);
+	vec[0]=atan2(t3,t4);
+}
+
 static inline float deg_to_rad (float deg) {
 	return deg/180.0f*M_PI;
 }

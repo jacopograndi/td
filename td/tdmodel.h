@@ -21,5 +21,6 @@ typedef struct {
 } Mesh;
 
 Mesh* model_load (char *filename);
+void model_verts_flat(float* vs, Mesh* mesh);
 
 #endif

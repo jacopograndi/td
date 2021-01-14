@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "portaudio.h"
-#include "gameaudio.h"
+#include "tdaudio.h"
 
 static void mix (GameAudioData *data, float *signal) {
 	signal[0] = 0; signal[1] = 0; 

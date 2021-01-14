@@ -6,7 +6,7 @@
 #include <math.h>
 
 #include "dataframe.h"
-#include "gameinput.h"
+#include "tdinput.h"
 
 #define DEBUG_RAYCAST 0
 
@@ -101,7 +101,7 @@ void game_process (GLFWwindow* window, GameState *gst, GameInput *com) {
 	vec3_add(gst->cam_pos, gst->cam_pos, gst->cam_vel);
 	gst->cam_pos[0] *= 0.85f;
 	gst->cam_pos[1] *= 0.85f;
-	gst->cam_pos[2] *= 0.95f;
+	gst->cam_pos[2] *= 0.85f;
 	//printf("(%f, %f, %f)\n", gst->cam_pos[0], gst->cam_pos[1], gst->cam_pos[2]);
 	/*
 	float dist = raycast_nearest(gst, out, gst->cam_pos, dir);

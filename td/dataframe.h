@@ -1,9 +1,9 @@
 #ifndef dataframeh
 #define dataframeh
 
-#include "gameinput.h"
+#include "tdinput.h"
 #include "linmath.h"
-#include "model.h"
+#include "tdmodel.h"
 #include "dynamic_array.h"
 
 typedef struct windowOpt {

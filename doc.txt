@@ -11,12 +11,12 @@ math library (linmath)
 keyboard and mouse input (glfw)
 raytracing
 scene management
-
-MISSING:
 font
 gui
-physics engine
-timestep
 images loading
 images rendering
+timestep
+
+MISSING:
+physics engine
 networking

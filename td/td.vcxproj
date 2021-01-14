@@ -94,7 +94,7 @@
       <PreprocessorDefinitions>PA_USE_ASIO;FT2_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>portaudio_x86.lib;freetyped.lib;opengl32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ode_singled.lib;portaudio_x86.lib;freetyped.lib;opengl32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>NotSet</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -145,30 +145,32 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\glad.c" />
-    <ClCompile Include="gameaudio.c" />
-    <ClCompile Include="gameinput.c" />
-    <ClCompile Include="gameprocess.c" />
-    <ClCompile Include="gamerender.c" />
-    <ClCompile Include="graphics.c" />
+    <ClCompile Include="tdaudio.c" />
+    <ClCompile Include="tdfont.c" />
+    <ClCompile Include="tdinput.c" />
+    <ClCompile Include="tdprocess.c" />
+    <ClCompile Include="tdrender.c" />
+    <ClCompile Include="tdgraphics.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="model.c" />
-    <ClCompile Include="shader.c" />
-    <ClCompile Include="wavelib.c" />
+    <ClCompile Include="tdmodel.c" />
+    <ClCompile Include="tdshader.c" />
+    <ClCompile Include="tdwavelib.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dataframe.h" />
     <ClInclude Include="dynamic_array.h" />
-    <ClInclude Include="gameaudio.h" />
-    <ClInclude Include="gameinput.h" />
-    <ClInclude Include="gameprocess.h" />
-    <ClInclude Include="gamerender.h" />
-    <ClInclude Include="graphics.h" />
+    <ClInclude Include="tdaudio.h" />
+    <ClInclude Include="tdfont.h" />
+    <ClInclude Include="tdinput.h" />
+    <ClInclude Include="tdprocess.h" />
+    <ClInclude Include="tdrender.h" />
+    <ClInclude Include="tdgraphics.h" />
     <ClInclude Include="linmath.h" />
-    <ClInclude Include="model.h" />
+    <ClInclude Include="tdmodel.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="shader.h" />
+    <ClInclude Include="tdshader.h" />
     <ClInclude Include="stb_image.h" />
-    <ClInclude Include="wavelib.h" />
+    <ClInclude Include="tdwavelib.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

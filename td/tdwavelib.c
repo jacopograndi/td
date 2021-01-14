@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <direct.h>
 
-#include "gameaudio.h"
-#include "wavelib.h"
+#include "tdaudio.h"
+#include "tdwavelib.h"
 
 int bytes_to_int_big_endian (char c[]) {
 	return (c[3] & 0x000000FF) | ((c[2] << 8) & 0x0000FF00) 

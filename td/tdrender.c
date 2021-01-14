@@ -3,7 +3,8 @@
 
 #include "linmath.h"
 #include "dataframe.h"
-#include "model.h"
+#include "tdmodel.h"
+#include "tdfont.h"
 
 void mat_from_transform (mat4x4 mat, vec3 pos, vec3 scale, quat rot) {
 	mat4x4 mat_trans;
@@ -48,30 +49,42 @@ void render_mesh (int shaderProgram, Mesh *mesh, mat4x4 mat_persp, mat4x4 cam,
 	glDrawElements(GL_TRIANGLES, mesh->indexes.cur, GL_UNSIGNED_INT, 0);
 }
 
-void game_render (GLFWwindow *window, int shader, int shaderterrain, GameState *gst, 
-	unsigned int texture) 
+void game_render(GLFWwindow* window,int shader,int shaderfont,GameState* gst,
+	unsigned int texture,Tdf* tdf, GameInput *com)
 {
-	WindowOpt *opt = ((WindowPtr*) glfwGetWindowUserPointer(window))->opt;
+	WindowOpt* opt=((WindowPtr*)glfwGetWindowUserPointer(window))->opt;
 
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
-	glDepthFunc(GL_LESS);  
+	glClearColor(0.2f,0.3f,0.3f,1.0f);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	glDepthFunc(GL_LESS);
+	glDisable(GL_BLEND);
 
-    // be sure to activate the shader before any calls to glUniform
-    glUseProgram(shader);
-		
+	// be sure to activate the shader before any calls to glUniform
+	glUseProgram(shader);
+
 	mat4x4 mat_persp;
-	mat4x4_perspective(mat_persp, 1.0f, (float)opt->scr_width/opt->scr_height, 0.1f, 1000.0f);
+	mat4x4_perspective(mat_persp,1.0f,(float)opt->scr_width/opt->scr_height,0.1f,1000.0f);
 
 	mat4x4 cam;
-	vec3 center; vec3_add(center, gst->cam_pos, gst->cam_forward);
-	mat4x4_look_at(cam, gst->cam_pos, center, gst->cam_up);
-	
+	vec3 center; vec3_add(center,gst->cam_pos,gst->cam_forward);
+	mat4x4_look_at(cam,gst->cam_pos,center,gst->cam_up);
+
 	for (int i=0; i<gst->gameElements.cur; i++) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		render_mesh(shader, gst->gameElements.arr[i].mesh, mat_persp, cam, 
-			gst->gameElements.arr[i].pos, gst->gameElements.arr[i].scale, 
-			gst->gameElements.arr[i].rot, gst->gameElements.arr[i].color, gst->light_pos);
+		glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D,texture);
+		render_mesh(shader,gst->gameElements.arr[i].mesh,mat_persp,cam,
+			gst->gameElements.arr[i].pos,gst->gameElements.arr[i].scale,
+			gst->gameElements.arr[i].rot,gst->gameElements.arr[i].color,gst->light_pos);
 	}
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glDepthFunc(GL_ALWAYS);
+	// font rendering 
+	tdfont_render_text(tdf,shaderfont,"This is sample text",25.0f,25.0f,1.0f,
+		(vec4) { 1.0,0.8f,0.2f,1.0f },
+		(vec2) {opt->scr_width,opt->scr_height});
+	tdfont_render_text(tdf,shaderfont,"This is sample text",com->xpos,opt->scr_height-com->ypos,1.0f,
+		(vec4) { 1.0,0.8f,0.2f,1.0f },
+		(vec2) { opt->scr_width,opt->scr_height });
 }

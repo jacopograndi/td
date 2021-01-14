@@ -19,7 +19,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 
 
-int init_graphics(GLFWwindow** window) {
+int init_graphics(GLFWwindow** window, float rx, float ry) {
 	// glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -36,7 +36,7 @@ int init_graphics(GLFWwindow** window) {
 
     // glfw window creation
     // --------------------
-    *window = glfwCreateWindow(900, 600, 
+    *window = glfwCreateWindow(rx, ry, 
 		"td"
 		, NULL, NULL
 	);
@@ -56,6 +56,9 @@ int init_graphics(GLFWwindow** window) {
         printf( "Failed to initialize GLAD\n");
         return -1;
     }
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
 	glEnable(GL_MULTISAMPLE); 
 	glEnable(GL_CULL_FACE);

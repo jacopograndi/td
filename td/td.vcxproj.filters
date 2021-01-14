@@ -18,31 +18,34 @@
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gameaudio.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gameprocess.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gameinput.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gamerender.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="graphics.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shader.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="model.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="wavelib.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\glad.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tdrender.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tdprocess.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tdinput.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tdaudio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tdgraphics.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tdshader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tdwavelib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tdmodel.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tdfont.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,30 +56,6 @@
     <ClInclude Include="linmath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gameaudio.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gameprocess.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gameinput.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gamerender.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="graphics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="wavelib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -84,6 +63,33 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tdaudio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tdprocess.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tdrender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tdinput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tdgraphics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tdwavelib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tdshader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tdmodel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tdfont.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
